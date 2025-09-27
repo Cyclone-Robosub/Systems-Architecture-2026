@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>PS5 Controller Test</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>PS5 Controller Test</h1>
+  <pre id="output">Connect your controller…</pre>
+
+  <script>
+    const output = document.getElementById('output');
+
+    function updateGamepad() {
+      const gp = navigator.getGamepads()[0]; // first controller
+      if (!gp) {
+        output.textContent = "❌ No controller detected";
+        requestAnimationFrame(updateGamepad);
+        return;
+      }
+
+      // Axes (sticks)
+      const leftStickX = gp.axes[0].toFixed(2);
+      const leftStickY = gp.axes[1].toFixed(2);
+      const rightStickX = gp.axes[2].toFixed(2);
+      const rightStickY = gp.axes[3].toFixed(2);
+
+      // Buttons (PS5: 0=cross, 1=circle, 2=square, 3=triangle)
+      const buttons = gp.buttons.map((b, i) => b.pressed ? i : "").filter(b => b !== "").join(", ");
+
+      output.textContent =
+        `Controller: ${gp.id}\n` +
+        `Left Stick:  [${leftStickX}, ${leftStickY}]\n` +
+        `Right Stick: [${rightStickX}, ${rightStickY}]\n` +
+        `Buttons pressed: ${buttons || "none"}`;
+
+      requestAnimationFrame(updateGamepad);
+    }
+
+    // When controller is connected
+    window.addEventListener("gamepadconnected", (e) => {
+      output.textContent = `✅ Controller connected: ${e.gamepad.id}`;
+      updateGamepad();
+    });
+
+    // When controller is disconnected
+    window.addEventListener("gamepaddisconnected", () => {
+      output.textContent = "⚠️ Controller disconnected";
+    });
+  </script>
+</body>
+</html>
