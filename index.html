@@ -14,6 +14,7 @@
 
   <script>
     const output = document.getElementById('output');
+    let animationFrameId;
 
     function updateGamepad() {
       const gp = navigator.getGamepads()[0]; // first controller
@@ -38,18 +39,20 @@
         `Right Stick: [${rightStickX}, ${rightStickY}]\n` +
         `Buttons pressed: ${buttons || "none"}`;
 
-      requestAnimationFrame(updateGamepad);
+      animationFrameId = requestAnimationFrame(updateGamepad);
     }
 
     // When controller is connected
     window.addEventListener("gamepadconnected", (e) => {
-      output.textContent = `✅ Controller connected: ${e.gamepad.id}`;
+      console.log(`Controller connected: ${e.gamepad.id}`); // Log to console
       updateGamepad();
     });
 
     // When controller is disconnected
     window.addEventListener("gamepaddisconnected", () => {
       output.textContent = "⚠️ Controller disconnected";
+      console.log("Controller disconnected"); // Log to console
+      cancelAnimationFrame(animationFrameId); // Pause updateGamepad loop
     });
   </script>
 </body>
