@@ -12,6 +12,43 @@
   <h1>PS5 Controller Test</h1>
   <pre id="output">Connect your controller…</pre>
 
+  <!-- roslibjs -->
+  <script src="https://cdn.jsdelivr.net/npm/roslib/src/RosLib.min.js"></script>
+
+  <!-- ROS connection -->
+  <script>
+    const rosNode = new ROSLIB.Ros({
+      url: 'ws://localhost:9090' // Adjust to your ROS bridge server
+    });
+
+    rosNode.on('connection', () => {
+      console.log('Connected to ROS bridge server.');
+    });
+
+    rosNode.on('error', (error) => {
+      console.error('Error connecting to ROS bridge server:', error);
+    });
+
+    rosNode.on('close', () => {
+      console.log('Connection to ROS bridge server closed.');
+    });
+
+    // Publisher for controller data
+    const controllerPub = new ROSLIB.Topic({
+      ros: rosNode,
+      name: '/ps5_controller',
+      messageType: 'std_msgs/Float32'
+    });
+
+    function publishControllerData(data) {
+      const msg = new ROSLIB.Message({
+        data: data
+      });
+      controllerPub.publish(msg);
+    }
+
+  </script>
+
   <script>
     const output = document.getElementById('output');
     let animationFrameId;
@@ -40,6 +77,9 @@
         `Buttons pressed: ${buttons || "none"}`;
 
       animationFrameId = requestAnimationFrame(updateGamepad);
+
+      // Example: Publish left stick X axis value to ROS
+      publishControllerData(parseFloat(leftStickX));
     }
 
     // When controller is connected
