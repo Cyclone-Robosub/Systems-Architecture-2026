@@ -12,8 +12,14 @@
   <h1>PS5 Controller Test</h1>
   <pre id="output">Connect your controller…</pre>
 
-  <!-- roslibjs -->
-  <script src="https://cdn.jsdelivr.net/npm/roslib/src/RosLib.min.js"></script>
+  <!-- roslibjs (correct path) -->
+  <script src="https://cdn.jsdelivr.net/npm/roslib/build/roslib.min.js"></script>
+  <script>
+    // Guard: ensure ROSLIB loaded correctly
+    if (!window.ROSLIB || typeof ROSLIB.Message === 'undefined') {
+      console.error('ROSLIB failed to load or Message is unavailable. Check the script src URL and network.');
+    }
+  </script>
 
   <!-- ROS connection -->
   <script>
@@ -37,7 +43,8 @@
     const controllerPub = new ROSLIB.Topic({
       ros: rosNode,
       name: '/ps5_controller',
-      messageType: 'std_msgs/Float32'
+      // ROS 2 message type notation includes '/msg/'
+      messageType: 'std_msgs/msg/Float32'
     });
 
     function publishControllerData(data) {
