@@ -1,6 +1,6 @@
 # PS5 Control scheme
 
-# Type name: `gamepad_msg`
+# Type name: `Gamepad`
 | Name  | Type      | Notes                 |
 | ----- | --------- | --------------------- |
 | x     | `float32` | Left joystick x axis  |
