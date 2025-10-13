@@ -18,3 +18,9 @@ git clone https://github.com/Cyclone-Robosub/Web_controller.git -b robot
 
 ## On browser
 open [this page](index.html)
+
+
+
+## To-Do
+- [ ] Investigate slew rate limiting
+- [ ] Investigate automatic depth control and stabilization
