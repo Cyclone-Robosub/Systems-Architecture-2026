@@ -39,7 +39,7 @@ public:
         // Publish the PWM signals to thrusters
       };
     subscription_ =
-      this->create_subscription<remote_control_interface::msg::Gamepad>("topic", 10, topic_callback);
+      this->create_subscription<remote_control_interface::msg::Gamepad>("ps5_controller", 10, topic_callback);
   }
 
 private:
