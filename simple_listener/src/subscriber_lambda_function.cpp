@@ -26,7 +26,17 @@ public:
   {
     auto topic_callback =
       [this](remote_control_interface::msg::Gamepad::UniquePtr msg) -> void {
-        RCLCPP_INFO(this->get_logger(), "I heard: '%f'", msg->x);
+        RCLCPP_INFO(this->get_logger(), "X : '%f'", msg->x);
+        RCLCPP_INFO(this->get_logger(), "Y : '%f'", msg->y);
+        RCLCPP_INFO(this->get_logger(), "Rise : '%f'", msg->rise);
+        RCLCPP_INFO(this->get_logger(), "Sink : '%f'", msg->sink);
+        RCLCPP_INFO(this->get_logger(), "Yaw : '%f'", msg->yaw);
+        RCLCPP_INFO(this->get_logger(), "Pitch : '%f'", msg->pitch);
+
+        // Get the values: x, y, rise, sink, yaw, pitch
+        // Convert to PWM signals for 8 thrusters
+
+        // Publish the PWM signals to thrusters
       };
     subscription_ =
       this->create_subscription<remote_control_interface::msg::Gamepad>("topic", 10, topic_callback);
