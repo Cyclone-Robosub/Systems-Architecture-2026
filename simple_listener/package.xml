@@ -7,6 +7,9 @@
   <maintainer email="ziqzhu@ucdavis.edu">kid</maintainer>
   <license>Apache-2.0</license>
 
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <test_depend>ament_lint_auto</test_depend>
