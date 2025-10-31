@@ -42,7 +42,7 @@
     // Publisher for controller data
     const controllerPub = new ROSLIB.Topic({
       ros: rosNode,
-      name: 'ps5_controller',
+      name: '/ps5_controller',
       // ROS 2 message type notation includes '/msg/'
       messageType: 'remote_control_interface/msg/Gamepad'
     });
