@@ -32,7 +32,7 @@ public:
   MinimalPublisher()
   : Node("minimal_publisher"), count_(0)
   {
-    publisher_ = this->create_publisher<remote_control_interface::msg::Gamepad>("topic", 10);
+    publisher_ = this->create_publisher<remote_control_interface::msg::Gamepad>("ps5_controller", 10);
     auto timer_callback =
       [this]() -> void {
         auto message = remote_control_interface::msg::Gamepad();
