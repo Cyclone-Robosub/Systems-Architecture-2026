@@ -16,6 +16,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
+#include "remote_control_interface/msg/gamepad.hpp"
 
 class MinimalSubscriber : public rclcpp::Node
 {
@@ -24,15 +25,15 @@ public:
   : Node("minimal_subscriber")
   {
     auto topic_callback =
-      [this](std_msgs::msg::String::UniquePtr msg) -> void {
-        RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg->data.c_str());
+      [this](remote_control_interface::msg::Gamepad::UniquePtr msg) -> void {
+        RCLCPP_INFO(this->get_logger(), "I heard: '%f'", msg->x);
       };
     subscription_ =
-      this->create_subscription<std_msgs::msg::String>("topic", 10, topic_callback);
+      this->create_subscription<remote_control_interface::msg::Gamepad>("topic", 10, topic_callback);
   }
 
 private:
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
+  rclcpp::Subscription<remote_control_interface::msg::Gamepad>::SharedPtr subscription_;
 };
 
 int main(int argc, char * argv[])

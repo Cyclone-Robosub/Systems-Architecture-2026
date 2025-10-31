@@ -10,8 +10,7 @@ find_package(ament_cmake REQUIRED)
 
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
-
-
+find_package(remote_control_interface REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -26,10 +25,10 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(talker src/publisher_lambda_function.cpp)
-ament_target_dependencies(talker rclcpp std_msgs)
+ament_target_dependencies(talker rclcpp std_msgs remote_control_interface)
 
 add_executable(listener src/subscriber_lambda_function.cpp)
-ament_target_dependencies(listener rclcpp std_msgs)
+ament_target_dependencies(listener rclcpp std_msgs remote_control_interface)
 
 install(TARGETS
   talker
