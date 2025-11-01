@@ -47,14 +47,14 @@
       messageType: 'remote_control_interface/msg/Gamepad'
     });
 
-    function publishControllerData(x) {
+    function publishControllerData(x = 0.0, y = 0.0, rise = 0.0, sink = 0.0, yaw = 0.0, pitch = 0.0) {
       const msg = new ROSLIB.Message({
         x: x,
-        y: 0.0,
-        rise: 0.0,
-        sink: 0.0,
-        yaw: 0.0,
-        pitch: 0.0,
+        y: y,
+        rise: rise,
+        sink: sink,
+        yaw: yaw,
+        pitch: pitch,
       });
       controllerPub.publish(msg);
     }
@@ -74,24 +74,34 @@
       }
 
       // Axes (sticks)
-      const leftStickX = gp.axes[0].toFixed(2);
-      const leftStickY = gp.axes[1].toFixed(2);
-      const rightStickX = gp.axes[2].toFixed(2);
-      const rightStickY = gp.axes[3].toFixed(2);
+      const leftStickX = gp.axes[0];
+      const leftStickY = gp.axes[1];
+      const rightStickX = gp.axes[2];
+      const rightStickY = gp.axes[3];
 
       // Buttons (PS5: 0=cross, 1=circle, 2=square, 3=triangle)
       const buttons = gp.buttons.map((b, i) => b.pressed ? i : "").filter(b => b !== "").join(", ");
 
+      // Triggers (L2=6, R2=7) and bumpers (L1=4, R1=5)
+      const l2 = gp.buttons[6].pressed ? gp.buttons[6].value : 0.0; // analog
+      const r2 = gp.buttons[7].pressed ? gp.buttons[7].value : 0.0; // analog
+
       output.textContent =
         `Controller: ${gp.id}\n` +
-        `Left Stick:  [${leftStickX}, ${leftStickY}]\n` +
-        `Right Stick: [${rightStickX}, ${rightStickY}]\n` +
-        `Buttons pressed: ${buttons || "none"}`;
+        `Left Stick:  [${leftStickX.toFixed(2)}, ${leftStickY.toFixed(2)}]\n` +
+        `Right Stick: [${rightStickX.toFixed(2)}, ${rightStickY.toFixed(2)}]\n` +
+        `Buttons pressed: ${buttons || "none"}\n` +
+        `L2: ${l2.toFixed(2)}, R2: ${r2.toFixed(2)}`;
 
       animationFrameId = requestAnimationFrame(updateGamepad);
 
       // Example: Publish left stick X axis value to ROS
-      publishControllerData(parseFloat(gp.axes[0]));
+      publishControllerData(
+        x = Math.abs(leftStickX) > 0.1 ? leftStickX : 0.0,
+        y = Math.abs(leftStickY) > 0.1 ? leftStickY : 0.0,
+        rise = r2,
+        sink = l2,
+      );
     }
 
     // When controller is connected
