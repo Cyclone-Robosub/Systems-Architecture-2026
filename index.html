@@ -44,12 +44,17 @@
       ros: rosNode,
       name: '/ps5_controller',
       // ROS 2 message type notation includes '/msg/'
-      messageType: 'std_msgs/msg/Float32'
+      messageType: 'remote_control_interface/msg/Gamepad'
     });
 
-    function publishControllerData(data) {
+    function publishControllerData(x = 0.0, y = 0.0, rise = 0.0, sink = 0.0, yaw = 0.0, pitch = 0.0) {
       const msg = new ROSLIB.Message({
-        data: data
+        x: x,
+        y: y,
+        rise: rise,
+        sink: sink,
+        yaw: yaw,
+        pitch: pitch,
       });
       controllerPub.publish(msg);
     }
@@ -79,24 +84,24 @@
         return;
       }
 
-      // Axes (sticks) as floats
-      const lx = gp.axes[0] || 0.0;
-      const ly = gp.axes[1] || 0.0;
-      const rx = gp.axes[2] || 0.0;
-      const ry = gp.axes[3] || 0.0;
-
-      // Triggers (L2 = 6, R2 = 7) as floats in [0,1]
-      const sink = (gp.buttons[6] && gp.buttons[6].value) || 0.0; // LT
-      const rise = (gp.buttons[7] && gp.buttons[7].value) || 0.0; // RT
+      // Axes (sticks)
+      const leftStickX = gp.axes[0];
+      const leftStickY = gp.axes[1];
+      const rightStickX = gp.axes[2];
+      const rightStickY = gp.axes[3];
 
       const buttons = gp.buttons.map((b, i) => b.pressed ? i : "").filter(b => b !== "").join(", ");
 
+      // Triggers (L2=6, R2=7) and bumpers (L1=4, R1=5)
+      const l2 = gp.buttons[6].pressed ? gp.buttons[6].value : 0.0; // analog
+      const r2 = gp.buttons[7].pressed ? gp.buttons[7].value : 0.0; // analog
+
       output.textContent =
         `Controller: ${gp.id}\n` +
-        `Left Stick:  [${lx.toFixed(2)}, ${ly.toFixed(2)}]\n` +
-        `Right Stick: [${rx.toFixed(2)}, ${ry.toFixed(2)}]\n` +
-        `Rise (R2): ${rise.toFixed(2)}  Sink (L2): ${sink.toFixed(2)}\n` +
-        `Buttons pressed: ${buttons || "none"}`;
+        `Left Stick:  [${leftStickX.toFixed(2)}, ${leftStickY.toFixed(2)}]\n` +
+        `Right Stick: [${rightStickX.toFixed(2)}, ${rightStickY.toFixed(2)}]\n` +
+        `Buttons pressed: ${buttons || "none"}\n` +
+        `L2: ${l2.toFixed(2)}, R2: ${r2.toFixed(2)}`;
 
       // Publish gamepad_msg
       publishGamepadMsg({
@@ -108,7 +113,15 @@
         pitch: ry
       });
 
-      animationFrameId = requestAnimationFrame(updateGamepad);
+      // Example: Publish left stick X axis value to ROS
+      publishControllerData(
+        x = Math.abs(leftStickX) > 0.1 ? leftStickX : 0.0,
+        y = Math.abs(leftStickY) > 0.1 ? leftStickY : 0.0,
+        rise = r2,
+        sink = l2,
+        yaw = Math.abs(rightStickX) > 0.1 ? rightStickX : 0.0,
+        pitch = Math.abs(rightStickY) > 0.1 ? rightStickY : 0.0,
+      );
     }
 
     // When controller is connected
