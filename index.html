@@ -59,17 +59,6 @@
       controllerPub.publish(msg);
     }
 
-    // Publisher for gamepad_msg
-    const gamepadPub = new ROSLIB.Topic({
-      ros: rosNode,
-      name: '/gamepad',
-      // Adjust if your ROS setup requires a package-qualified type
-      messageType: 'remote_control_interface/msg/Gamepad'
-    });
-
-    function publishGamepadMsg(msgObj) {
-      gamepadPub.publish(new ROSLIB.Message(msgObj));
-    }
   </script>
 
   <script>
@@ -80,7 +69,7 @@
       const gp = navigator.getGamepads()[0]; // first controller
       if (!gp) {
         output.textContent = "❌ No controller detected";
-        animationFrameId = requestAnimationFrame(updateGamepad);
+        requestAnimationFrame(updateGamepad);
         return;
       }
 
@@ -90,6 +79,7 @@
       const rightStickX = gp.axes[2];
       const rightStickY = gp.axes[3];
 
+      // Buttons (PS5: 0=cross, 1=circle, 2=square, 3=triangle)
       const buttons = gp.buttons.map((b, i) => b.pressed ? i : "").filter(b => b !== "").join(", ");
 
       // Triggers (L2=6, R2=7) and bumpers (L1=4, R1=5)
@@ -103,15 +93,7 @@
         `Buttons pressed: ${buttons || "none"}\n` +
         `L2: ${l2.toFixed(2)}, R2: ${r2.toFixed(2)}`;
 
-      // Publish gamepad_msg
-      publishGamepadMsg({
-        x: lx,
-        y: ly,
-        rise: rise,
-        sink: sink,
-        yaw: rx,
-        pitch: ry
-      });
+      animationFrameId = requestAnimationFrame(updateGamepad);
 
       // Example: Publish left stick X axis value to ROS
       publishControllerData(
