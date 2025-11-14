@@ -1,0 +1,23 @@
+{
+    "name": "ROS Devcontainer",
+    "privileged": true,
+    "remoteUser": "1000",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            // "USERNAME": "${localEnv:USER}",
+            // "USER_ID": "${localEnv:UID}",
+            // "GROUP_ID": "${localEnv:GID}",
+            "DOCKER_REPO": "ros",
+            "ROS_DISTRO": "jazzy",
+            "IMAGE_SUFFIX": ""
+        }
+    },
+    "workspaceFolder": "/home/ws",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/ws,type=bind",
+    "runArgs": [
+        // "--net=host",
+        // "-e", "DISPLAY=${env:DISPLAY}",
+        // "--gpus", "all"
+    ],
+}
