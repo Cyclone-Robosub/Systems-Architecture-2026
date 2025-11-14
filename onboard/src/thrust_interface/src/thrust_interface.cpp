@@ -16,6 +16,10 @@ Thrust_Interface::Thrust_Interface(std::vector<int> thrusters, char* pico_path, 
         pwm_received_subscription = this->create_subscription<custom_interfaces::msg::Pwms>("pwm_cmd", 10, 
             std::bind(&Thrust_Interface::pwm_received_subscription_callback, this, std::placeholders::_1));
         pico_fd = open_pico_serial(pico_path);
+        if (pico_fd < 0) {
+            RCLCPP_INFO(this->get_logger(), "Couldn't connect to Pico over serial!");
+            exit(42);
+        }
     }
     
 void Thrust_Interface::pwm_received_subscription_callback(custom_interfaces::msg::Pwms::UniquePtr pwms_msg) {
@@ -34,7 +38,6 @@ void Thrust_Interface::pwm_received_subscription_callback(custom_interfaces::msg
 void Thrust_Interface::send_to_pico(int thruster, int pwm) {
     std::string serial_message = "Set " + std::to_string(thruster) + " PWM " + std::to_string(pwm) + "\n";
     int length = serial_message.size() + 1;
-    RCLCPP_INFO(this->get_logger(), "Sending to pico: %s", serial_message.c_str());
     write(pico_fd, serial_message.c_str(), length);
 }
 
