@@ -1,7 +1,6 @@
 # The below gives you timestamps. I am leaving it out for now
 # std_msgs/Header Header
 
-
 # f = front / r = rear
 # l = left  / r = right
 # t = top   / b = bottom
