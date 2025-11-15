@@ -58,18 +58,25 @@ in `Gamepad.msg` file: see https://github.com/Cyclone-Robosub/Web_controller/blo
     3. acceleration: list of 3 floats (x, y, z)
 6. `current_control_mode` - Which control mode the robot is currently in (designed to be read by Jason's stuff)
 
-1. Vision Related Topics: TBD
+7. Vision Related Topics: TBD
     - seen_objects, includes vector_to_object - list of the objects the camera system has identified with meta data like distances, confidences
     - raw_image - raw image files
     - vision_velocity - velocity estimate from vision algorithms
-2. `ps5_controller` - Remote Control Related Topics (Gamepad.msg)
+8. `ps5_controller` - Remote Control Related Topics (Gamepad.msg)
     
-3. DVL related topics
+9. DVL related topics
     - sensor_ctrl - for all sensors # Probably deprecated
     - ~~sensor_toggles~~ - for all sensors
     - dvl_data: Position type
-4. Battery
+10. Battery
 - bms - battery data: voltage (float32), current (float32)
+
+#### Heartbeats:
+These are boolean sent from the mux to the thruster interface to indicate that it's alive and kicking. If not received, the receiver sends a stop command after 1 second. The value passed (true or false) has no effect on the behaviour of the heartbeat, but sending true is probably advised for readability.
+1. `mux_heartbeat` - sent from mux to thruster interface
+2. `ctrl_heartbeat` - sent from matlab to mux
+3. `cli_heartbeat` - sent from cli to mux
+
 
 ### Services & Actions
 
