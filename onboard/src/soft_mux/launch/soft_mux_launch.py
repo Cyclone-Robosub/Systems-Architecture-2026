@@ -1,11 +1,16 @@
-import launch
-import launch_ros.actions 
+from launch import LaunchDescription
+from launch_ros.actions import Node
 
 def generate_launch_description():
-   return launch.LaunchDescription([
-        launch_ros.actions.Node(
+   return LaunchDescription([
+        Node(
+            # name of the package
             package='soft_mux',
+            # name of the elf
             executable='soft_mux',
-            name="softmux_node"
+            # Name of the node
+            name="softmux_node",
+            # Writes to the stdout
+            output="screen"
         )
-    ]),
+    ])
