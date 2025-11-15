@@ -8,31 +8,27 @@
 #include <unistd.h>
 /* For serial */
 
+using namespace std::chrono_literals;
 using namespace rclcpp;
 
-// Production constructor - opens serial port
-Thrust_Interface::Thrust_Interface(std::vector<int> thrusters, char* pico_path, 
-                                   int min_pwm, int max_pwm) : 
-    Node("thrust_interface"), 
-    thrusters(thrusters), 
-    min_pwm(min_pwm), 
-    max_pwm(max_pwm),
-    owns_fd(true) {  // We opened it, so we'll close it
-    
-    pwm_received_subscription = this->create_subscription<custom_interfaces::msg::Pwms>(
-        "pwm_cmd", 10, 
-        std::bind(&Thrust_Interface::pwm_received_subscription_callback, this, std::placeholders::_1));
-    
-    pico_fd = open_pico_serial(pico_path);
-    if (pico_fd < 0) {
-        RCLCPP_ERROR(this->get_logger(), "Couldn't connect to Pico over serial!");
-        exit(42);
-    }
-    
-    RCLCPP_INFO(this->get_logger(), "Connected to Pico on %s (fd=%d)", pico_path, pico_fd);
+// Production constructor
+Thrust_Interface::Thrust_Interface(std::vector<int> thrusters, char* pico_path, int min_pwm, int max_pwm) : 
+    Node("thrust_interface"), thrusters(thrusters), min_pwm(min_pwm), max_pwm(max_pwm),owns_fd(true), no_heartbeat(true)  {
+        pwm_subscription = this->create_subscription<custom_interfaces::msg::Pwms>("pwm_cmd", 10, 
+            std::bind(&Thrust_Interface::pwm_received_subscription_callback, this, std::placeholders::_1));
+        heartbeat_subscription = this->create_subscription<std_msgs::msg::Bool>("mux_heartbeat", 10, 
+            std::bind(&Thrust_Interface::mux_heartbeat_received_callback, this, std::placeholders::_1));
+        pico_fd = open_pico_serial(pico_path);
+        if (pico_fd < 0) {
+            RCLCPP_INFO(this->get_logger(), "Couldn't connect to Pico over serial!");
+            exit(42);
+        }
+        RCLCPP_INFO(this->get_logger(), "Connected to Pico on %s (fd=%d)", pico_path, pico_fd);
+        heartbeat_timer = this->create_wall_timer(500ms, 
+            std::bind(&Thrust_Interface::heartbeat_check_callback, this)); // heartbeat timer
 }
 
-// Testing constructor - uses provided file descriptor
+// Testing constructor
 Thrust_Interface::Thrust_Interface(std::vector<int> thrusters, int pico_fd, 
                                    int min_pwm, int max_pwm, bool is_test_mode) : 
     Node("thrust_interface"), 
@@ -40,11 +36,16 @@ Thrust_Interface::Thrust_Interface(std::vector<int> thrusters, int pico_fd,
     pico_fd(pico_fd),
     min_pwm(min_pwm), 
     max_pwm(max_pwm),
-    owns_fd(false) {  // FD provided externally, don't close it
+    owns_fd(false),
+    no_heartbeat(true)
+     {
     
     pwm_received_subscription = this->create_subscription<custom_interfaces::msg::Pwms>(
         "pwm_cmd", 10, 
         std::bind(&Thrust_Interface::pwm_received_subscription_callback, this, std::placeholders::_1));
+
+    heartbeat_subscription = this->create_subscription<std_msgs::msg::Bool>("mux_heartbeat", 10, 
+            std::bind(&Thrust_Interface::mux_heartbeat_received_callback, this, std::placeholders::_1));
     
     if (pico_fd < 0) {
         RCLCPP_ERROR(this->get_logger(), "Invalid file descriptor provided: %d", pico_fd);
@@ -54,16 +55,11 @@ Thrust_Interface::Thrust_Interface(std::vector<int> thrusters, int pico_fd,
     if (is_test_mode) {
         RCLCPP_INFO(this->get_logger(), "Running in test mode with fd=%d", pico_fd);
     }
-}
 
-// Destructor - only close fd if we own it
-Thrust_Interface::~Thrust_Interface() {
-    if (owns_fd && pico_fd >= 0) {
-        RCLCPP_INFO(this->get_logger(), "Closing serial connection (fd=%d)", pico_fd);
-        close(pico_fd);
-    }
+    heartbeat_timer = this->create_wall_timer(500ms, 
+            std::bind(&Thrust_Interface::heartbeat_check_callback, this)); // heartbeat timer
 }
-
+    
 void Thrust_Interface::pwm_received_subscription_callback(custom_interfaces::msg::Pwms::UniquePtr pwms_msg) {
     std::array<int, 8> pwms = pwms_msg->pwms;
     
@@ -75,6 +71,25 @@ void Thrust_Interface::pwm_received_subscription_callback(custom_interfaces::msg
             pwms[i] = max_pwm;
         }
         send_to_pico(thrusters[i], pwms[i]);
+    }
+}
+
+void Thrust_Interface::mux_heartbeat_received_callback(std_msgs::msg::Bool::UniquePtr heartbeat) {
+    most_recent_heartbeat = std::chrono::steady_clock::now();
+    (void)heartbeat; // stop compiler complaining
+}
+
+void Thrust_Interface::heartbeat_check_callback() {
+    auto current_time = std::chrono::steady_clock::now();
+    if (current_time - most_recent_heartbeat > 1s) {
+        RCLCPP_INFO(this->get_logger(), "Didn't get heartbeat from mux. Sending stop command.");
+        no_heartbeat = true;
+        for (int i = 0; i < 8; i++) {
+            send_to_pico(thrusters[i], 1500);
+        }        
+    }
+    else {
+        no_heartbeat = false;
     }
 }
 
@@ -133,8 +148,8 @@ int Thrust_Interface::open_pico_serial(char* pico_path) {
 
 int main(int argc, char* argv[]) {
     std::vector<int> thrusters = {8, 9, 6, 7, 13, 11, 12, 10};
-    char pico_path[] = "/dev/serial/by-id/usb-MicroPython_Board_in_FS_mode_e663682593227739-if00";
-    
+    char pico_path[] = "/dev/serial/by-id/usb-MicroPython_Board_in_FS_mode_e66130100f198434-if00";
+
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<Thrust_Interface>(thrusters, pico_path, 1200, 1800));
     rclcpp::shutdown();
