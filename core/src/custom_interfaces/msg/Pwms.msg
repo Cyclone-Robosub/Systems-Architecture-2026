@@ -7,7 +7,7 @@
 # For example, flt, means front-left-top in order of apperance
 # pwm for the thruster of the robot
 # A array of 8 ints which maps the thrusters in this order:
-# flt, flb, frt, frb
-# rlt, rlb, rrt, rrb
+# flt, frt, rlt, rrt,
+# flb, frb, rlb, rrb
 
 int32[8] pwms
