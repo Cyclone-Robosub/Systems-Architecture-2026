@@ -85,3 +85,4 @@ These are boolean sent from the mux to the thruster interface to indicate that i
 2. `[sensor]_settings` - service containing sensor settings (vision, DVL, maybe BMS)
     1. one of these services per sensor. Each has unique data corresponding to individual sensor specs, plus a toggle field
 3. TBD action about updating waypoints
+4. `trigger_dropper` - service to trigger manipulations dropper. We're expecting this to be sent to a seperate microcontroller (probably a Pico) to the robot thrusters Pico. Like the heartbeats, this probably contains just a boolean without intrinsic meaning: the receipt of the signal itself contains all the information we need to take action (i.e. release the dropper).
