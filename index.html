@@ -83,8 +83,8 @@
       const buttons = gp.buttons.map((b, i) => b.pressed ? i : "").filter(b => b !== "").join(", ");
 
       // Triggers (L2=6, R2=7) and bumpers (L1=4, R1=5)
-      const l2 = gp.buttons[6].pressed ? gp.buttons[6].value : 0.0; // analog
-      const r2 = gp.buttons[7].pressed ? gp.buttons[7].value : 0.0; // analog
+      const l2 = gp.buttons[6].value; // analog
+      const r2 = gp.buttons[7].value; // analog
 
       output.textContent =
         `Controller: ${gp.id}\n` +
