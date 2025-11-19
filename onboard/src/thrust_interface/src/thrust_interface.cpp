@@ -64,7 +64,10 @@ void Thrust_Interface::heartbeat_check_callback() {
 void Thrust_Interface::send_to_pico(int thruster, int pwm) {
     std::string serial_message = "Set " + std::to_string(thruster) + " PWM " + std::to_string(pwm) + "\n";
     int length = serial_message.size();
-    write(pico_fd, serial_message.c_str(), length);
+    RCLCPP_INFO(this->get_logger(), "Sending PWM %d to thruster %d", pwm, thruster);
+    if (write(pico_fd, serial_message.c_str(), length) < 0) {
+        RCLCPP_INFO(this->get_logger(), "Failed to send command to Pico.");
+    }
 }
 
 int Thrust_Interface::open_pico_serial(char* pico_path) { // Adapted from WiringPi serial interface
