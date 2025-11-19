@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>PS5 Controller Test</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>PS5 Controller Test</h1>
+  <pre id="output">Connect your controller…</pre>
+
+  <!-- roslibjs (correct path) -->
+  <script src="https://cdn.jsdelivr.net/npm/roslib/build/roslib.min.js"></script>
+  <script>
+    // Guard: ensure ROSLIB loaded correctly
+    if (!window.ROSLIB || typeof ROSLIB.Message === 'undefined') {
+      console.error('ROSLIB failed to load or Message is unavailable. Check the script src URL and network.');
+    }
+  </script>
+
+  <!-- ROS connection -->
+  <script>
+    const rosNode = new ROSLIB.Ros({
+      url: 'ws://localhost:9090' // Adjust to your ROS bridge server
+    });
+
+    rosNode.on('connection', () => {
+      console.log('Connected to ROS bridge server.');
+    });
+
+    rosNode.on('error', (error) => {
+      console.error('Error connecting to ROS bridge server:', error);
+    });
+
+    rosNode.on('close', () => {
+      console.log('Connection to ROS bridge server closed.');
+    });
+
+    // Publisher for controller data
+    const controllerPub = new ROSLIB.Topic({
+      ros: rosNode,
+      name: '/ps5_controller',
+      // ROS 2 message type notation includes '/msg/'
+      messageType: 'remote_control_interface/msg/Gamepad'
+    });
+
+    function publishControllerData(x = 0.0, y = 0.0, rise = 0.0, sink = 0.0, yaw = 0.0, pitch = 0.0) {
+      const msg = new ROSLIB.Message({
+        x: x,
+        y: y,
+        rise: rise,
+        sink: sink,
+        yaw: yaw,
+        pitch: pitch,
+      });
+      controllerPub.publish(msg);
+    }
+
+  </script>
+
+  <script>
+    const output = document.getElementById('output');
+    let animationFrameId;
+
+    function updateGamepad() {
+      const gp = navigator.getGamepads()[0]; // first controller
+      if (!gp) {
+        output.textContent = "❌ No controller detected";
+        requestAnimationFrame(updateGamepad);
+        return;
+      }
+
+      // Axes (sticks)
+      const leftStickX = gp.axes[0];
+      const leftStickY = gp.axes[1];
+      const rightStickX = gp.axes[2];
+      const rightStickY = gp.axes[3];
+
+      // Buttons (PS5: 0=cross, 1=circle, 2=square, 3=triangle)
+      const buttons = gp.buttons.map((b, i) => b.pressed ? i : "").filter(b => b !== "").join(", ");
+
+      // Triggers (L2=6, R2=7) and bumpers (L1=4, R1=5)
+      const l2 = gp.buttons[6].value; // analog
+      const r2 = gp.buttons[7].value; // analog
+
+      output.textContent =
+        `Controller: ${gp.id}\n` +
+        `Left Stick:  [${leftStickX.toFixed(2)}, ${leftStickY.toFixed(2)}]\n` +
+        `Right Stick: [${rightStickX.toFixed(2)}, ${rightStickY.toFixed(2)}]\n` +
+        `Buttons pressed: ${buttons || "none"}\n` +
+        `L2: ${l2.toFixed(2)}, R2: ${r2.toFixed(2)}`;
+
+      animationFrameId = requestAnimationFrame(updateGamepad);
+
+      // Example: Publish left stick X axis value to ROS
+      publishControllerData(
+        x = Math.abs(leftStickX) > 0.1 ? leftStickX : 0.0,
+        y = Math.abs(leftStickY) > 0.1 ? leftStickY : 0.0,
+        rise = r2,
+        sink = l2,
+        yaw = Math.abs(rightStickX) > 0.1 ? rightStickX : 0.0,
+        pitch = Math.abs(rightStickY) > 0.1 ? rightStickY : 0.0,
+      );
+    }
+
+    // When controller is connected
+    window.addEventListener("gamepadconnected", (e) => {
+      console.log(`Controller connected: ${e.gamepad.id}`); // Log to console
+      updateGamepad();
+    });
+
+    // When controller is disconnected
+    window.addEventListener("gamepaddisconnected", () => {
+      output.textContent = "⚠️ Controller disconnected";
+      console.log("Controller disconnected"); // Log to console
+      cancelAnimationFrame(animationFrameId); // Pause updateGamepad loop
+    });
+  </script>
+</body>
+</html>
