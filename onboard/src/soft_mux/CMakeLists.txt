@@ -7,9 +7,21 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(custom_interfaces REQUIRED)
+find_package(std_srvs REQUIRED)
+
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+
+add_executable(soft_mux src/mux_sherry.cpp)
+ament_target_dependencies(soft_mux rclcpp custom_interfaces std_srvs)
+
+include_directories(
+  ${PROJECT_SOURCE_DIR}/src
+  ${PROJECT_SOURCE_DIR}/include
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -22,5 +34,14 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+install(TARGETS
+  soft_mux
+  DESTINATION lib/${PROJECT_NAME})
+
+install(DIRECTORY
+launch
+DESTINATION share/${PROJECT_NAME}/
+)
 
 ament_package()
