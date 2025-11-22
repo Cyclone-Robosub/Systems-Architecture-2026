@@ -23,13 +23,13 @@ public:
     ~Thrust_Interface();
 
 private:
-    void pwm_received_callback(custom_interfaces::msg::Pwms::UniquePtr pwms_msg);
+    void pwm_received_subscription_callback(custom_interfaces::msg::Pwms::UniquePtr pwms_msg);
     void send_to_pico(int thruster, int pwm);
     int open_pico_serial(char* pico_path);
     
     void mux_heartbeat_received_callback(std_msgs::msg::Bool::UniquePtr heartbeat);
     void heartbeat_check_callback();
-    rclcpp::Subscription<custom_interfaces::msg::Pwms>::SharedPtr pwm_subscription;
+    rclcpp::Subscription<custom_interfaces::msg::Pwms>::SharedPtr pwm_received_subscription;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr heartbeat_subscription;
     rclcpp::TimerBase::SharedPtr heartbeat_timer;
     std::vector<int> thrusters;

@@ -14,7 +14,7 @@ using namespace rclcpp;
 // Production constructor
 Thrust_Interface::Thrust_Interface(std::vector<int> thrusters, char* pico_path, int min_pwm, int max_pwm) : 
     Node("thrust_interface"), thrusters(thrusters), min_pwm(min_pwm), max_pwm(max_pwm),owns_fd(true), no_heartbeat(true)  {
-        pwm_subscription = this->create_subscription<custom_interfaces::msg::Pwms>("pwm_cmd", 10, 
+        pwm_received_subscription = this->create_subscription<custom_interfaces::msg::Pwms>("pwm_cmd", 10, 
             std::bind(&Thrust_Interface::pwm_received_subscription_callback, this, std::placeholders::_1));
         heartbeat_subscription = this->create_subscription<std_msgs::msg::Bool>("mux_heartbeat", 10, 
             std::bind(&Thrust_Interface::mux_heartbeat_received_callback, this, std::placeholders::_1));
