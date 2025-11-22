@@ -59,6 +59,13 @@ Thrust_Interface::Thrust_Interface(std::vector<int> thrusters, int pico_fd,
     heartbeat_timer = this->create_wall_timer(500ms, 
             std::bind(&Thrust_Interface::heartbeat_check_callback, this)); // heartbeat timer
 }
+
+Thrust_Interface::~Thrust_Interface() {
+    if (owns_fd && pico_fd >= 0) {
+        RCLCPP_INFO(this->get_logger(), "Closing serial connection (fd=%d)", pico_fd);
+        close(pico_fd);
+    }
+}
     
 void Thrust_Interface::pwm_received_subscription_callback(custom_interfaces::msg::Pwms::UniquePtr pwms_msg) {
     std::array<int, 8> pwms = pwms_msg->pwms;
@@ -146,6 +153,8 @@ int Thrust_Interface::open_pico_serial(char* pico_path) {
     return fd;
 }
 
+#ifndef ENABLE_TESTING
+
 int main(int argc, char* argv[]) {
     std::vector<int> thrusters = {8, 9, 6, 7, 13, 11, 12, 10};
     char pico_path[] = "/dev/serial/by-id/usb-MicroPython_Board_in_FS_mode_e66130100f198434-if00";
@@ -156,3 +165,5 @@ int main(int argc, char* argv[]) {
     
     return 0;
 }
+#endif
+

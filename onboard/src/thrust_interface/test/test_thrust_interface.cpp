@@ -312,6 +312,7 @@ TEST_F(TestThrustInterface, BoundaryValues) {
     }
 }
 
+#ifdef ENABLE_TESTING
 /**
  * @brief Main test runner
  */
@@ -319,3 +320,4 @@ int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+#endif
