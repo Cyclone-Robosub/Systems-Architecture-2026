@@ -9,7 +9,7 @@ def generate_launch_description():
             # name of the elf
             executable='thrust_interface',
             # Name of the node
-            name="thrust_interface_node",
+            name="thrust_interface",
             # Writes to the stdout
             output="screen"
         )
