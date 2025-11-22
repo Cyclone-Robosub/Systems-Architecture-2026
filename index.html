@@ -83,9 +83,9 @@
 
       // Axes (sticks)
       const leftStickX = gp.axes[0];
-      const leftStickY = gp.axes[1];
+      const leftStickY = gp.axes[1]*-1; //ps5 controller inverts
       const rightStickX = gp.axes[2];
-      const rightStickY = gp.axes[3];
+      const rightStickY = gp.axes[3]*-1; //ps5 controller inverts
 
       // Buttons (PS5: 0=cross, 1=circle, 2=square, 3=triangle)
       const buttons = gp.buttons.map((b, i) => b.pressed ? i : "").filter(b => b !== "").join(", ");
