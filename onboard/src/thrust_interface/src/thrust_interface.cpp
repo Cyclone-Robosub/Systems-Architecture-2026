@@ -42,12 +42,11 @@ void Thrust_Interface::pwm_received_subscription_callback(custom_interfaces::msg
         return;
     }
     std::array<int, 8> pwms = pwms_msg->pwms;
+    
     for (int i = 0; i < 8; i++) {
-        if (pwms[i] < min_pwm) {
-            pwms[i] = min_pwm;
-        }
-        if (pwms[i] > max_pwm) {
-            pwms[i] = max_pwm;
+        if (pwms[i] != 0) {
+            pwms[i] = std::max(pwms[i], min_pwm);
+            pwms[i] = std::min(pwms[i], max_pwm);
         }
         send_to_pico(thrusters[i], pwms[i]);
     }

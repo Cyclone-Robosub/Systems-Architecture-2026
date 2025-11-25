@@ -364,6 +364,31 @@ TEST_F(TestThrustInterface, NoHeartbeat) {
     }
 }
 
+/**
+ * @brief Test 0 PWM goes through properly
+ */
+TEST_F(TestThrustInterface, ZeroPWM) {
+    create_node_with_params(1200, 1800);
+    
+    auto msg = std::make_shared<custom_interfaces::msg::Pwms>();
+    // Set valid PWM values
+    for (int i = 0; i < 8; i++) {
+        msg->pwms[i] = 0;
+    }
+    
+    publish_heartbeat();
+    publish_and_process(msg);
+    
+    std::string output = read_serial_output(200);
+    
+    // Verify that all commands have PWM value of 1500 (unchanged)
+    for (int i = 0; i < 8; i++) {
+        std::string expected = "Set " + std::to_string(test_thrusters[i]) + " PWM 0";
+        EXPECT_NE(output.find(expected), std::string::npos)
+            << "Expected unchanged PWM command for thruster " << test_thrusters[i];
+    }
+}
+
 
 #ifdef ENABLE_TESTING
 /**
