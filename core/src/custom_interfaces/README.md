@@ -36,7 +36,7 @@ geometry_msgs/Vector3 acceleration # [x, y, z], type provided by ROS
 in `Control_mode.srv` file:
 
 ```cpp
-bool request_mode # matlab = 1, manual = 0
+bool is_matlab_mode # matlab = 1, manual = 0
 --
 bool status 
 ```
