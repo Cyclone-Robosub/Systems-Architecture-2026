@@ -131,7 +131,7 @@ int Thrust_Interface::open_pico_serial(std::string pico_path) {
 
 int main(int argc, char* argv[]) {
     std::vector<int> thrusters = {8, 9, 6, 7, 13, 11, 12, 10};
-    int fd = Thrust_Interface::open_pico_serial("/dev/serial/by-id/usb-MicroPython_Board_in_FS_mode_e663682593227739-if00");
+    int fd = Thrust_Interface::open_pico_serial("/dev/serial/by-id/usb-MicroPython_Board_in_FS_mode_e66130100f198434-if00");
 
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<Thrust_Interface>(thrusters, fd, 1200, 1800));
