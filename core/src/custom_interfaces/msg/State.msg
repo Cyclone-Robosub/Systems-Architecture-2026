@@ -1,3 +1,3 @@
-Position position 
-Position velocity 
-geometry_msgs/Vector3 acceleration # [x, y, z], type provided by ROS
+geometry_msgs/Pose position
+geometry_msgs/Pose velocity
+geometry_msgs/Pose acceleration
