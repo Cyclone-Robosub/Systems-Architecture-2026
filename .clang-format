@@ -1,0 +1,84 @@
+---
+# Based on LLVM style with customizations
+BasedOnStyle: LLVM
+
+# Indentation
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ContinuationIndentWidth: 4
+
+# Braces
+BreakBeforeBraces: Allman
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+
+# Line breaks and alignment
+ColumnLimit: 0
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignOperands: true
+AlignTrailingComments: false
+
+# Constructor initializer lists
+BreakConstructorInitializers: BeforeColon
+ConstructorInitializerIndentWidth: 0
+PackConstructorInitializers: Never
+
+# Spaces
+SpaceAfterCStyleCast: true
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpacesInContainerLiterals: false
+
+# Pointers and references
+PointerAlignment: Left
+DerivePointerAlignment: false
+
+# Function calls and declarations
+AllowAllParametersOfDeclarationOnNextLine: true
+BinPackParameters: false
+BinPackArguments: false
+
+# Control statements
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortBlocksOnASingleLine: Never
+
+# Include sorting
+SortIncludes: false
+
+# Comments
+ReflowComments: false
+
+# Penalties (lower = preferred)
+PenaltyBreakBeforeFirstCallParameter: 0
+PenaltyBreakComment: 0
+PenaltyBreakString: 0
+PenaltyExcessCharacter: 0
+
+# Keep empty lines
+MaxEmptyLinesToKeep: 2
+
+# Namespace indentation
+NamespaceIndentation: None
+
+# Access modifiers
+AccessModifierOffset: -4
+
+# Other
+AlwaysBreakAfterReturnType: None
+AlwaysBreakTemplateDeclarations: Yes
+KeepEmptyLinesAtTheStartOfBlocks: true

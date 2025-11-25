@@ -1,0 +1,3 @@
+bool is_matlab_mode # matlab = 1, manual = 0
+---
+bool status
