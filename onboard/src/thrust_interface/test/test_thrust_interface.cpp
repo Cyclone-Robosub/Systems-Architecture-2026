@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <rclcpp/rclcpp.hpp>
 #include <custom_interfaces/msg/pwms.hpp>
+#include "std_msgs/msg/bool.hpp"
 #include "thrust_interface.hpp"
 #include <fcntl.h>
 #include <unistd.h>
@@ -94,8 +95,7 @@ protected:
             test_thrusters, 
             pipe_fds[1],  // Write end of pipe
             min_pwm, 
-            max_pwm,
-            true  // Test mode
+            max_pwm
         );
     }
     
@@ -113,6 +113,23 @@ protected:
         publisher->publish(*msg);
         
         // Process the message
+        rclcpp::spin_some(node);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    /**
+     * @brief Helper to publish the heartbeat message
+     */
+    void publish_heartbeat() {
+        auto publisher = node->create_publisher<std_msgs::msg::Bool>("mux_heartbeat", 10);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        auto message = std_msgs::msg::Bool();
+        message.data = true;
+
+        publisher->publish(message);
+
         rclcpp::spin_some(node);
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
@@ -141,7 +158,7 @@ TEST_F(TestThrustInterface, PWMClampingMinimum) {
     for (int i = 0; i < 8; i++) {
         msg->pwms[i] = 1000;  // Below min_pwm of 1200
     }
-    
+    publish_heartbeat();
     publish_and_process(msg);
     
     // Read all serial output
@@ -167,6 +184,7 @@ TEST_F(TestThrustInterface, PWMClampingMaximum) {
         msg->pwms[i] = 2000;  // Above max_pwm of 1800
     }
     
+    publish_heartbeat();
     publish_and_process(msg);
     
     std::string output = read_serial_output(200);
@@ -191,6 +209,7 @@ TEST_F(TestThrustInterface, ValidPWMValues) {
         msg->pwms[i] = 1500;  // Valid value within range
     }
     
+    publish_heartbeat();
     publish_and_process(msg);
     
     std::string output = read_serial_output(200);
@@ -219,6 +238,7 @@ TEST_F(TestThrustInterface, MixedPWMValues) {
     msg->pwms[6] = 1800;  // At max boundary
     msg->pwms[7] = 1400;  // Valid
     
+    publish_heartbeat();
     publish_and_process(msg);
     
     std::string output = read_serial_output(200);
@@ -263,6 +283,7 @@ TEST_F(TestThrustInterface, CustomPWMLimits) {
         msg->pwms[i] = 1500;
     }
     
+    publish_heartbeat();
     publish_and_process(msg);
     
     std::string output = read_serial_output(200);
@@ -296,6 +317,7 @@ TEST_F(TestThrustInterface, BoundaryValues) {
         msg->pwms[i] = 1800;
     }
     
+    publish_heartbeat();
     publish_and_process(msg);
     
     std::string output = read_serial_output(200);
@@ -311,6 +333,37 @@ TEST_F(TestThrustInterface, BoundaryValues) {
         EXPECT_NE(output.find(expected), std::string::npos);
     }
 }
+
+/**
+ * @brief Test don't accept commands when no heartbeat
+ */
+TEST_F(TestThrustInterface, NoHeartbeat) {
+    create_node_with_params(1200, 1800);
+
+    auto msg = std::make_shared<custom_interfaces::msg::Pwms>();
+    // Set valid PWM values
+    for (int i = 0; i < 8; i++) {
+        msg->pwms[i] = 1800;
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    publish_and_process(msg);
+
+    std::string output = read_serial_output(200);
+
+    // Verify that all commands have PWM value of 1500 instead of 1800
+    for (int i = 0; i < 8; i++) {
+        std::string expected = "Set " + std::to_string(test_thrusters[i]) + " PWM 1500";
+        EXPECT_NE(output.find(expected), std::string::npos)
+            << "Expected unchanged PWM command for thruster " << test_thrusters[i];
+
+        std::string not_expected = "Set " + std::to_string(test_thrusters[i]) + " PWM 1800";
+        EXPECT_EQ(output.find(not_expected), std::string::npos)
+            << "Expected to not send our original command " << test_thrusters[i];
+    }
+}
+
 
 #ifdef ENABLE_TESTING
 /**
