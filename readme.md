@@ -14,7 +14,7 @@
 - rise: Thrusters[1, 2, 3, 4] pwm = 1500 + 100 * rise
 - sink: Thrusters[1, 2, 3, 4] pwm = 1500 - 100 * sink
 
-## how to run the web controller
+## How to run the web controller
 1. You **MUST** run the rosbridge server first. tis bridge ros to the browser.
 ```
 ros2 launch rosbridge_server rosbridge_websocket_launch.xml
@@ -27,5 +27,10 @@ ros2 launch rosbridge_server rosbridge_websocket_launch.xml
    2. Run:
       ```
       source install/setup.bash
-      
+      ros2 run simple_listener listener
       ```
+   3. Finally connect the ps5 contorller and open the index page. Use chrome or chromium-based browser as firefox have issue giving analog values for certain triggers.
+   ```
+   google-chrome index.html
+   ```
+   4. You should now see the 
