@@ -15,22 +15,22 @@
 - sink: Thrusters[1, 2, 3, 4] pwm = 1500 - 100 * sink
 
 ## How to run the web controller
-1. You **MUST** run the rosbridge server first. tis bridge ros to the browser.
-```
-ros2 launch rosbridge_server rosbridge_websocket_launch.xml
-```
-2. Build and run the web controller.
-   1. Go to the workspace containing the web controller, and run:
+You must run these commands in this order. Failure to do so will result in publish/subscribing errors.
+1. Build and run the web controller.
+   1. Go to the workspace containing the web controller, and run the commands below **DO NOT START THE NODE YET**
 ```
 colcon build
 source install/setup.bash
-ros2 run simple_listener talker
+```
+2. Run the rosbridge server first. This node bridge ros to the browser. 
+```
+ros2 launch rosbridge_server rosbridge_websocket_launch.xml
 ```
 3. Finally connect the ps5 contorller and open the index page. Use chrome or chromium-based browser as firefox have issue giving analog values for certain triggers.
 ```
 google-chrome index.html
 ```
-4. You should now see the with `ros2 topic list`:
+4. You should now see the `ps5_controller` with `ros2 topic list`:
 ```
 cyclone@Cyclone-General:~/Web_controller$ ros2 topic list
 /client_count
