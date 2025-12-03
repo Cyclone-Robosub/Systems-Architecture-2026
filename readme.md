@@ -21,16 +21,21 @@ ros2 launch rosbridge_server rosbridge_websocket_launch.xml
 ```
 2. Build and run the web controller.
    1. Go to the workspace containing the web controller, and run:
-   ```
-   colcon build
-   ```
-   2. Run:
-      ```
-      source install/setup.bash
-      ros2 run simple_listener listener
-      ```
-   3. Finally connect the ps5 contorller and open the index page. Use chrome or chromium-based browser as firefox have issue giving analog values for certain triggers.
-   ```
-   google-chrome index.html
-   ```
-   4. You should now see the 
+```
+colcon build
+source install/setup.bash
+ros2 run simple_listener talker
+```
+3. Finally connect the ps5 contorller and open the index page. Use chrome or chromium-based browser as firefox have issue giving analog values for certain triggers.
+```
+google-chrome index.html
+```
+4. You should now see the with `ros2 topic list`:
+```
+cyclone@Cyclone-General:~/Web_controller$ ros2 topic list
+/client_count
+/connected_clients
+/parameter_events
+/ps5_controller
+/rosout
+```
