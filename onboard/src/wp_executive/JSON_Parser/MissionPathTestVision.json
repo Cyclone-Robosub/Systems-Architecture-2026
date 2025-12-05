@@ -1,0 +1,16 @@
+{
+  "$schema": "./MissionSchema.json",
+  "tasks": [
+    {
+      "name": "Detect target object",
+      "steps": [
+        {
+          "type": "vision",
+          "position": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+          "vision_command": "BINS_SPOTTED",
+          "max_time": 5
+        }
+      ]
+    }
+  ]
+}

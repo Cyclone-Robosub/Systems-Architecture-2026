@@ -1,0 +1,59 @@
+{
+  "$schema": "./MissionSchema.json",
+  "tasks": [
+    {
+      "name": "Navigate to pickup zone",
+      "steps": [
+        {
+          "type": "waypoint",
+          "position": [1.0, 2.0, 0.0, 0.0, 0.0, 90.0],
+          "hold_time": 2.5,
+          "max_time": 3
+        },
+        {
+          "type": "vision",
+          "position": [1.0, 2.0, 0.0, 0.0, 0.0, 90.0],
+          "vision_command": "BOX_DETECED",
+          "max_time": 1
+        }
+      ]
+    },
+    {
+      "name": "Pick up object",
+      "steps": [
+        {
+          "type": "manipulation",
+          "manipulation_command": 1,
+          "position": [1.0, 2.0, 0.0, 0.0, 0.0, 90.0],
+          "hold_time": 1,
+          "max_time": 2
+        }
+      ]
+    },
+    {
+      "name": "Wait before delivery",
+      "steps": [
+        {
+          "type": "wait",
+          "time": 1
+        }
+      ]
+    },
+    {
+      "name": "Navigate to drop-off zone",
+      "steps": [
+        {
+          "type": "waypoint",
+          "position": [5.0, 3.0, 0.0, 0.0, 0.0, 180.0],
+          "hold_time": 1.0,
+          "max_time": 2
+        },
+        {
+          "type": "manipulation",
+          "manipulation_command": 0,
+          "max_time": 1
+        }
+      ]
+    }
+  ]
+}
