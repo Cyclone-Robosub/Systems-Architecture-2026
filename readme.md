@@ -10,10 +10,6 @@
 | yaw   | `float32` | [-1.0, 1.0] | Right joystick x axis |
 | pitch | `float32` | [-1.0, 1.0] | Right joystick y axis |
 
-## Mapping values
-- rise: Thrusters[1, 2, 3, 4] pwm = 1500 + 100 * rise
-- sink: Thrusters[1, 2, 3, 4] pwm = 1500 - 100 * sink
-
 ## How to run the web controller
 You must run these commands in this order. Failure to do so will result in publish/subscribing errors.
 1. Build and run the web controller.
