@@ -75,12 +75,11 @@ void SoftMux::ctrl_heartbeat_check_callback() {
         if (current_time - recent_ctrl_heartbeat > 1s) {
             // stop command
             no_heartbeat = true;
-            custom_interfaces::msg::Pwms::UniquePtr stop_pwms;
+            auto stop_pwms = custom_interfaces::msg::Pwms();
             for (int i = 0; i < 8; i++) {
-                stop_pwms->pwms[i] = 1500;
-                pwm_cmd_publish(std::move(stop_pwms));
+                stop_pwms.pwms[i] = 1500;
             }
-
+            pwm_cmd_publish(std::make_unique<custom_interfaces::msg::Pwms>(stop_pwms));
         }
     }
 }
@@ -96,11 +95,11 @@ void SoftMux::cli_heartbeat_check_callback() {
         if (current_time - recent_ctrl_heartbeat > 1s) {
             // stop command
             no_heartbeat = true;
-            custom_interfaces::msg::Pwms::UniquePtr stop_pwms;
+            auto stop_pwms = custom_interfaces::msg::Pwms();
             for (int i = 0; i < 8; i++) {
-                stop_pwms->pwms[i] = 1500;
-                pwm_cmd_publish(std::move(stop_pwms));
+                stop_pwms.pwms[i] = 1500;
             }
+            pwm_cmd_publish(std::make_unique<custom_interfaces::msg::Pwms>(stop_pwms));
         }
 
     }   
