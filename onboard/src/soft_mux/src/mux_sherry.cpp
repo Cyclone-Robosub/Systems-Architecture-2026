@@ -16,7 +16,7 @@ SoftMux::SoftMux() : rclcpp::Node("SoftMux") {
 
 
 void SoftMux::pwm_ctrl_callback(custom_interfaces::msg::Pwms::UniquePtr pwm) {
-    if (no_heartbeat) {
+    if (no_ctrl_heartbeat) {
         return;
     }
     if (is_matlab_mode) {
@@ -25,7 +25,7 @@ void SoftMux::pwm_ctrl_callback(custom_interfaces::msg::Pwms::UniquePtr pwm) {
 }
 
 void SoftMux::pwm_cli_callback(custom_interfaces::msg::Pwms::UniquePtr pwm) {
-    if (no_heartbeat) {
+    if (no_cli_heartbeat) {
         return;
     }
     if (!is_matlab_mode) {
@@ -41,7 +41,7 @@ void SoftMux::set_mode_srv(const std::shared_ptr<std_srvs::srv::SetBool::Request
     this->is_matlab_mode = request->data;
     if (this->is_matlab_mode == request->data) {
         if (mode_change) {
-            std_msgs::msg::Bool message;
+            auto message = std_msgs::msg::Bool();
             message.data = this->is_matlab_mode;
             this->current_control_mode->publish(message);
             std::cout << message.data << std::endl; // TODO: Remove prints before merging to main
@@ -57,50 +57,56 @@ void SoftMux::pwm_cmd_publish(custom_interfaces::msg::Pwms::UniquePtr pwm) {
     for (int i = 0; i < 8; i++) { // TODO: Remove prints before merging to main
          std::cout << "PWM " << i << " is sent as " << pwm->pwms[i] << "\n";
     }
-
 }
 
 void SoftMux::ctrl_heartbeat_callback(std_msgs::msg::Bool::UniquePtr heartbeat) {
-    if (is_matlab_mode) {
-        recent_ctrl_heartbeat = std::chrono::steady_clock::now();
+    recent_ctrl_heartbeat = std::chrono::steady_clock::now();
+    if (no_ctrl_heartbeat) {
+        no_ctrl_heartbeat = false; // If we just received a heartbeat, then we certainly have a heartbeat!
     }
-    (void) heartbeat;
+    (void) heartbeat; // stop compiler complaining about unused variables
 }
 
 void SoftMux::ctrl_heartbeat_check_callback() {
     if (is_matlab_mode) {
         auto current_time = std::chrono::steady_clock::now();
         if (current_time - recent_ctrl_heartbeat > 1s) {
-            // stop command
-            no_heartbeat = true;
-            auto stop_pwms = custom_interfaces::msg::Pwms();
-            for (int i = 0; i < 8; i++) {
-                stop_pwms.pwms[i] = 1500;
-            }
-            pwm_cmd_publish(std::make_unique<custom_interfaces::msg::Pwms>(stop_pwms));
+            RCLCPP_INFO(this->get_logger(), "Didn't get heartbeat from cli. Sending stop command.");
+            no_ctrl_heartbeat = true;
+            publish_stop_command();
+        }
+        else {
+            no_ctrl_heartbeat = false;
         }
     }
 }
 void SoftMux::cli_heartbeat_callback(std_msgs::msg::Bool::UniquePtr heartbeat){
-    if(!is_matlab_mode){
-        recent_ctrl_heartbeat = std::chrono::steady_clock::now();
+    recent_cli_heartbeat = std::chrono::steady_clock::now();
+    if (no_cli_heartbeat) {
+        no_cli_heartbeat = false; // If we just received a heartbeat, then we certainly have a heartbeat!
     }
-    (void) heartbeat;
+    (void) heartbeat; // stop compiler complaining about unused variables
 }
 void SoftMux::cli_heartbeat_check_callback() {
     if (!is_matlab_mode) {
         auto current_time = std::chrono::steady_clock::now();
         if (current_time - recent_ctrl_heartbeat > 1s) {
-            // stop command
-            no_heartbeat = true;
-            auto stop_pwms = custom_interfaces::msg::Pwms();
-            for (int i = 0; i < 8; i++) {
-                stop_pwms.pwms[i] = 1500;
-            }
-            pwm_cmd_publish(std::make_unique<custom_interfaces::msg::Pwms>(stop_pwms));
+            RCLCPP_INFO(this->get_logger(), "Didn't get heartbeat from cli. Sending stop command.");
+            no_cli_heartbeat = true;
+            publish_stop_command();
         }
-
+        else {
+            no_cli_heartbeat = false;
+        }
     }   
+}
+
+void SoftMux::publish_stop_command() {
+    auto stop_pwms = custom_interfaces::msg::Pwms();
+    for (int i = 0; i < 8; i++) {
+        stop_pwms.pwms[i] = 1500;
+    }
+    pwm_cmd_publish(std::make_unique<custom_interfaces::msg::Pwms>(stop_pwms));
 }
 
 int main(int argc, char* argv[]) {

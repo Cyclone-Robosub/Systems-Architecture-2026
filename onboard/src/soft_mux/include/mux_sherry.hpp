@@ -20,6 +20,7 @@ class SoftMux : public rclcpp::Node {
         void cli_heartbeat_callback(std_msgs::msg::Bool::UniquePtr heartbeat);
         void cli_heartbeat_check_callback();
         void pwm_cmd_publish(custom_interfaces::msg::Pwms::UniquePtr pwm);
+        void publish_stop_command();
         bool is_matlab_mode;
         rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr control_mode;
         rclcpp::Subscription<custom_interfaces::msg::Pwms>::SharedPtr pwm_ctrl_subscriber;
@@ -30,7 +31,8 @@ class SoftMux : public rclcpp::Node {
         rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr current_control_mode;
         rclcpp::TimerBase::SharedPtr ctrl_heartbeat_timer;
         rclcpp::TimerBase::SharedPtr cli_heartbeat_timer;
-        bool no_heartbeat = false;
+        bool no_ctrl_heartbeat = true;
+        bool no_cli_heartbeat = true;
         std::chrono::time_point<std::chrono::steady_clock> recent_ctrl_heartbeat;
         std::chrono::time_point<std::chrono::steady_clock> recent_cli_heartbeat;
 };
