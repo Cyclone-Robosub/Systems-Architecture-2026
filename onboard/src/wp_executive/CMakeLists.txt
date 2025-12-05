@@ -11,40 +11,27 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(EXPORT_COMPILE_COMMANDS ON)
 
-# Disable nlohmann_json tests to avoid conflicts
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(custom_interface REQUIRED)
+find_package(tomlplusplus CONFIG REQUIRED)
 
 # Add include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/JSON_Parser)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(lib/json-schema-validator)
-include_directories(lib/nlohmann_json)
-
-# Add json dependency first, then json-schema-validator
-add_subdirectory(lib/nlohmann_json)
-add_subdirectory(lib/json-schema-validator)
 
 # Create main executable
 add_executable(${PROJECT_NAME}
   src/mainWaypoint.cpp
   src/WaypointExecutive.cpp
   src/Task.cpp
-  JSON_Parser/MissionAnalyzer.cpp
-  crs_common/position/position.cpp
-   JSON_Parser/JsonHelper.cpp
 )
 
 # Link libraries to main executable (plain signature)
 target_link_libraries(${PROJECT_NAME}
-  nlohmann_json::nlohmann_json
-  nlohmann_json_schema_validator
+  tomlplusplus
 )
 
 # Add ament dependencies to main executable
@@ -63,15 +50,11 @@ if(BUILD_TESTING)
     test/test_waypoint.cpp
     src/WaypointExecutive.cpp
     src/Task.cpp
-    JSON_Parser/MissionAnalyzer.cpp
-    crs_common/position/position.cpp
-    JSON_Parser/JsonHelper.cpp
   )
   
   # Link libraries to test executable (plain signature)
   target_link_libraries(${PROJECT_NAME}_test
-    nlohmann_json::nlohmann_json
-    nlohmann_json_schema_validator
+  tomlplusplus
   )
   
   # Add ament dependencies to test executable
