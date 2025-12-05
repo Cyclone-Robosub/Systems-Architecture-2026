@@ -1,0 +1,9 @@
+[submodule "crs_common"]
+	path = crs_common
+	url = https://github.com/Cyclone-Robosub/crs_common.git
+[submodule "lib/json-schema-validator"]
+	path = lib/json-schema-validator
+	url = https://github.com/pboettch/json-schema-validator.git
+[submodule "lib/nlohmann_json"]
+	path = lib/nlohmann_json
+	url = https://github.com/nlohmann/json.git

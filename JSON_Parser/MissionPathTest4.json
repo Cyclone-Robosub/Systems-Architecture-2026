@@ -1,0 +1,18 @@
+{
+  "tasks": [
+    {
+      "VisionTask": [
+        {
+          "set_control_mode": "vision"
+        },
+        {
+          "waypoint": {
+            "position": [9, 9, 9, 0, 0, 0],
+            "hold_time": 5,
+            "max_time": 3
+          }
+        }
+      ]
+    }
+  ]
+}

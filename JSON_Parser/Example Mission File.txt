@@ -1,0 +1,40 @@
+Example Mission File
+____________________________________________________________________________
+Startup
+> wait for start condition (default timer)
+> control mode: waypoint
+> wait 3sec //calibration phase (in matlab code)
+
+Gate
+> waypoint 1 [x,y,z,0,0,yaw], touch
+> waypoint 2 [x,y,z,0,0,yaw], touch
+> barrel roll (pre-programmed maneuver for a certain amount of time), 2 seconds
+> waypoint 3 [x,y,z,0,0,yaw], touch
+
+
+Dropper Task
+> waypoint 4, touch
+> waypoint 5, touch
+> waypoint 6, touch //near bins, can be interrupted by "I see the bins" flag
+> control mode: vision //switch to control mode using downward facing camera, Wait for vision interrupt + altitude ok flag //over the correct bin, drop both torpedoes in succession -> exits vision control mode
+> control mode: waypoint
+
+Octagon
+> waypoint, touch
+> waypoint, touch
+> waypoint, hold 5 seconds //depth of zero to surface
+> waypoint, touch
+
+Return through gate
+> waypoint, touch
+> waypoint, touch
+> barrel roll (maybe for funsies)
+> waypoint, touch
+> stop
+
+
+_______________________________________________________________________________
+To do:
+script/excel file to transform coordinates from pool-corner-frame to NED frame
+Test pre-programmed barrel roll maneuver
+Start with manually entered .json, add more human-readable converter time permitting
