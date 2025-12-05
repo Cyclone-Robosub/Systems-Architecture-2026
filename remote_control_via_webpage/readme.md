@@ -1,0 +1,37 @@
+# PS5 Gamepad to control the submarine
+
+# Type name: `Gamepad`
+| Name  | Type      | Value range | Notes                 |
+| ----- | --------- | ----------- | --------------------- |
+| x     | `float32` | [-1.0, 1.0] | Left joystick x axis  |
+| y     | `float32` | [-1.0, 1.0] | Left joystick y axis  |
+| rise  | `float32` | [0.0, 1.0]  | Activates rise (RT)   |
+| sink  | `float32` | [0.0, 1.0]  | Activates sink (LT)   |
+| yaw   | `float32` | [-1.0, 1.0] | Right joystick x axis |
+| pitch | `float32` | [-1.0, 1.0] | Right joystick y axis |
+
+## How to run the web controller
+You must run these commands in this order. Failure to do so will result in publish/subscribing errors.
+1. Build and run the web controller.
+   1. Go to the workspace containing the web controller, and run the commands below **DO NOT START THE NODE YET**
+```
+colcon build
+source install/setup.bash
+```
+2. Run the rosbridge server first. This node bridge ros to the browser. 
+```
+ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+```
+3. Finally connect the ps5 contorller and open the index page. Use chrome or chromium-based browser as firefox have issue giving analog values for certain triggers.
+```
+google-chrome index.html
+```
+4. You should now see the `ps5_controller` with `ros2 topic list`:
+```
+cyclone@Cyclone-General:~/Web_controller$ ros2 topic list
+/client_count
+/connected_clients
+/parameter_events
+/ps5_controller
+/rosout
+```
