@@ -6,8 +6,8 @@
 #include "std_msgs/msg/bool.hpp"
 #include "std_srvs/srv/set_bool.hpp"
 
-
 class SoftMux : public rclcpp::Node {
+    friend class TestSoftMuxInterface;
     public:
         SoftMux();
         void pwm_ctrl_callback(custom_interfaces::msg::Pwms::UniquePtr pwm);
@@ -35,4 +35,3 @@ class SoftMux : public rclcpp::Node {
         std::chrono::time_point<std::chrono::steady_clock> recent_ctrl_heartbeat;
         std::chrono::time_point<std::chrono::steady_clock> recent_cli_heartbeat;
 };
-#endif
