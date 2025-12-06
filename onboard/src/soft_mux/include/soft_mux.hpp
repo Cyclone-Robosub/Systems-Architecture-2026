@@ -1,5 +1,4 @@
-#ifndef MUX_SHERRY_HPP
-#define MUX_SHERRY_HPP
+#pragma once
 
 #include <chrono>
 #include "rclcpp/rclcpp.hpp"

@@ -15,11 +15,10 @@ find_package(std_srvs REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
-add_executable(soft_mux src/mux_sherry.cpp)
+add_executable(soft_mux src/soft_mux.cpp)
 ament_target_dependencies(soft_mux rclcpp custom_interfaces std_srvs)
 
 include_directories(
-  ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_SOURCE_DIR}/include
 )
 
