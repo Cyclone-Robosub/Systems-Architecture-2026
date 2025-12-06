@@ -7,8 +7,8 @@
 #include "std_srvs/srv/set_bool.hpp"
 
 class SoftMux : public rclcpp::Node {
-    friend class TestSoftMuxInterface;
     public:
+        friend class TestSoftMuxInterface_MuxSendChosenPwms_Test;
         SoftMux();
         void pwm_ctrl_callback(custom_interfaces::msg::Pwms::UniquePtr pwm);
         void pwm_cli_callback(custom_interfaces::msg::Pwms::UniquePtr pwm);

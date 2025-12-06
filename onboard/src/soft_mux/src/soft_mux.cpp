@@ -109,9 +109,11 @@ void SoftMux::publish_stop_command() {
     pwm_cmd_publish(std::make_unique<custom_interfaces::msg::Pwms>(stop_pwms));
 }
 
-int main(int argc, char* argv[]) {
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<SoftMux>());
-    rclcpp::shutdown();
-    return 0;
-}
+#ifndef ENABLE_TESTING
+    int main(int argc, char* argv[]) {
+        rclcpp::init(argc, argv);
+        rclcpp::spin(std::make_shared<SoftMux>());
+        rclcpp::shutdown();
+        return 0;
+    }
+#endif

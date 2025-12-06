@@ -47,8 +47,13 @@ TEST_F(TestSoftMuxInterface, MuxConstruction) {
     EXPECT_EQ(mux->get_name(), std::string("SoftMux"));
 }
 TEST_F(TestSoftMuxInterface, MuxSendChosenPwms) {
+    // create mux to test
     createMux();
    
+    /* generate sample messages
+       msg1: sent through pwm_ctrl
+       msg2: sent through pwm_cli
+    */
     auto msg1 = std::make_unique<custom_interfaces::msg::Pwms>();
     auto msg2 = std::make_unique<custom_interfaces::msg::Pwms>();
     for (int i = 0; i < 8; i++) {
@@ -57,29 +62,38 @@ TEST_F(TestSoftMuxInterface, MuxSendChosenPwms) {
     for (int i = 0; i < 8; i++) {
          msg2->pwms[i] = 8 * (i + 7);
     }
-    publish_and_process(std::move(msg1), "pwm_ctrl");
-    publish_and_process(std::move(msg2), "pwm_cli");
+    
+    //publish_and_process(std::move(msg1), "pwm_ctrl");
+    //publish_and_process(std::move(msg2), "pwm_cli");
+
+    // to hold the pwms received
     auto msgR = std::make_unique<custom_interfaces::msg::Pwms>();
+
     mux->is_matlab_mode = true;
     ASSERT_NE(mux, nullptr);
-    mux->pwm_ctrl_callback();
-    mux->pwm_cli_callback();
+    mux->pwm_ctrl_callback(std::move(msg1));
+    mux->pwm_cli_callback(std::move(msg2));
     subscribe_and_process(std::move(msgR));
+    
     ASSERT_NE(msgR, nullptr);
     for (int i = 0; i < 8; i++) {
-        EXPECT_EQ(msgR->pwms[i], msg1->pwms[1])
+        EXPECT_EQ(msgR->pwms[i], msg1->pwms[1]);
     }
+
     mux->is_matlab_mode = false;
-    mux->pwm_ctrl_callback();
-    mux->pwm_cli_callback();
+    mux->pwm_ctrl_callback(std::move(msg1));
+    mux->pwm_cli_callback(std::move(msg2));
     ASSERT_NE(mux, nullptr);
     subscribe_and_process(std::move(msgR));
     ASSERT_NE(msgR, nullptr);
     for (int i = 0; i < 8; i++) {
-        EXPECT_EQ(msgR->pwms[i], msg2->pwms[1])
+        EXPECT_EQ(msgR->pwms[i], msg2->pwms[1]);
     }
 }
-int main(int argc, char** argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+
+#ifdef ENABLE_TESTING
+    int main(int argc, char** argv) {
+        ::testing::InitGoogleTest(&argc, argv);
+        return RUN_ALL_TESTS();
+    }
+#endif
