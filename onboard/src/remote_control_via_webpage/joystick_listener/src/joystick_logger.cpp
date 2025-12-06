@@ -16,11 +16,11 @@
 #include <rclcpp/rclcpp.hpp>
 #include "custom_interfaces/msg/gamepad.hpp"
 
-class MinimalSubscriber : public rclcpp::Node
+class JoystickLogger : public rclcpp::Node
 {
 public:
-  MinimalSubscriber()
-  : Node("minimal_subscriber")
+  JoystickLogger()
+  : Node("joystick_logger")
   {
     auto topic_callback =
       [this](custom_interfaces::msg::Gamepad::UniquePtr msg) -> void {
@@ -30,11 +30,6 @@ public:
         RCLCPP_INFO(this->get_logger(), "Sink : '%f'", msg->sink);
         RCLCPP_INFO(this->get_logger(), "Yaw : '%f'", msg->yaw);
         RCLCPP_INFO(this->get_logger(), "Pitch : '%f'", msg->pitch);
-
-        // Get the values: x, y, rise, sink, yaw, pitch
-        // Convert to PWM signals for 8 thrusters
-
-        // Publish the PWM signals to thrusters
       };
     subscription_ =
       this->create_subscription<custom_interfaces::msg::Gamepad>("ps5_controller", 10, topic_callback);
@@ -47,7 +42,7 @@ private:
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<MinimalSubscriber>());
+  rclcpp::spin(std::make_shared<JoystickLogger>());
   rclcpp::shutdown();
   return 0;
 }
