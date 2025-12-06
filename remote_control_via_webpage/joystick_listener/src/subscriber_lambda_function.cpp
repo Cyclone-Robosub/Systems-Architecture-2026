@@ -13,10 +13,8 @@
 // limitations under the License.
 
 #include <memory>
-
-#include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
-#include "remote_control_interface/msg/gamepad.hpp"
+#include <rclcpp/rclcpp.hpp>
+#include "custom_interfaces/msg/gamepad.hpp"
 
 class MinimalSubscriber : public rclcpp::Node
 {
@@ -25,7 +23,7 @@ public:
   : Node("minimal_subscriber")
   {
     auto topic_callback =
-      [this](remote_control_interface::msg::Gamepad::UniquePtr msg) -> void {
+      [this](custom_interfaces::msg::Gamepad::UniquePtr msg) -> void {
         RCLCPP_INFO(this->get_logger(), "X : '%f'", msg->x);
         RCLCPP_INFO(this->get_logger(), "Y : '%f'", msg->y);
         RCLCPP_INFO(this->get_logger(), "Rise : '%f'", msg->rise);
@@ -39,11 +37,11 @@ public:
         // Publish the PWM signals to thrusters
       };
     subscription_ =
-      this->create_subscription<remote_control_interface::msg::Gamepad>("ps5_controller", 10, topic_callback);
+      this->create_subscription<custom_interfaces::msg::Gamepad>("ps5_controller", 10, topic_callback);
   }
 
 private:
-  rclcpp::Subscription<remote_control_interface::msg::Gamepad>::SharedPtr subscription_;
+  rclcpp::Subscription<custom_interfaces::msg::Gamepad>::SharedPtr subscription_;
 };
 
 int main(int argc, char * argv[])
