@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'cli'
+package_name = 'pwm_cli'
 
 setup(
     name=package_name,
@@ -13,8 +13,8 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='william',
-    maintainer_email='wobarber@outlook.com',
+    maintainer='Cyclone Robosub',
+    maintainer_email='crs.ucd@gmail.com',
     description='TODO: Package description',
     license='TODO: License declaration',
     extras_require={
@@ -24,7 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'cli = cli.cli:main'
+            'pwm_cli_node = pwm_cli.cli_console:main'
         ],
     },
 )

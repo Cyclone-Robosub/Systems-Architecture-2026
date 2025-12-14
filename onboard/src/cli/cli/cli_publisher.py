@@ -9,7 +9,7 @@ from std_msgs.msg import Bool
 
 class CLIPublisher(Node):
 	def __init__(self):
-		super().__init__('cli')
+		super().__init__('pwm_cli')
 		self.publisher_ = self.create_publisher(Pwms, 'pwm_cli', 10)
 
 	def publish_pwm(self, pwms):
