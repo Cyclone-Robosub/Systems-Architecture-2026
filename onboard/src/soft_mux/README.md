@@ -4,13 +4,18 @@
 ### Topics
 - `pwm_ctrl`: pwm from Matlab
 - `pwm_cli`: pwm from the cli
+- `ctrl_heartbeat`: heartbeat from Matlab.
+- `cli_heartbeat`: heartbeat from CLI.
 
 ### Services
 - `Control_mode`: A service to set the mode. Return whether the mode is set sucessfully
 
 ## Outputs
 ### Topics
-- `pwm_cmd`
+- `pwm_cmd`: the pwm to be sent to the thrusters
+- `mux_heartbeat`: heartbeat to the thruster interface
+
+Note that all heartbeats should be published at least once per second, and checked at least once every 1/2 a second.
 
 ## Pseudocode
 ```C++

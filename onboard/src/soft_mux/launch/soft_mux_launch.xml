@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <node pkg="soft_mux" exec="soft_mux" name="soft_mux_node" output="screen"/>
+</launch>

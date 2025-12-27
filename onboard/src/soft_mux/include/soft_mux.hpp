@@ -1,0 +1,60 @@
+#pragma once
+
+
+#include <chrono>
+#include "rclcpp/rclcpp.hpp"
+#include "custom_interfaces/msg/pwms.hpp"
+#include "std_msgs/msg/bool.hpp"
+#include "std_srvs/srv/set_bool.hpp"
+
+
+class SoftMux : public rclcpp::Node {
+    public:
+        friend class TestSoftMuxInterface_MuxSendCtrlPwms_Test;
+        friend class TestSoftMuxInterface_MuxSendCliPwms_Test;
+        friend class TestSoftMuxInterface_MuxTestService_Test;
+        friend class TestSoftMuxInterface_MuxTestInputHB_Test;
+        friend class TestSoftMuxInterface_NoCtrlHeartbeatTriggersStop_Test;
+        friend class TestSoftMuxInterface_NoCliHeartbeatTriggersStop_Test;
+        friend class TestSoftMuxInterface_NoCtrlHeartbeatonCli_Test;
+        friend class TestSoftMuxInterface_NoCliHeartbeatonCtrl_Test;
+        friend class TestSoftMuxInterface_MuxHeartbeat_Test;
+        SoftMux();
+        void pwm_ctrl_callback(custom_interfaces::msg::Pwms::UniquePtr pwm);
+        void pwm_cli_callback(custom_interfaces::msg::Pwms::UniquePtr pwm);
+        void set_mode_srv(const std::shared_ptr<std_srvs::srv::SetBool::Request> request, std::shared_ptr<std_srvs::srv::SetBool::Response> response);
+    private:
+        void ctrl_heartbeat_callback(std_msgs::msg::Bool::UniquePtr heartbeat);
+        void ctrl_heartbeat_check_callback();
+        void cli_heartbeat_callback(std_msgs::msg::Bool::UniquePtr heartbeat);
+        void cli_heartbeat_check_callback();
+        void pwm_cmd_publish(custom_interfaces::msg::Pwms::UniquePtr pwm);
+        void publish_stop_command();
+        void mux_heartbeat_send();
+       
+        rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr control_mode;
+       
+        rclcpp::Subscription<custom_interfaces::msg::Pwms>::SharedPtr pwm_ctrl_subscriber;
+        rclcpp::Subscription<custom_interfaces::msg::Pwms>::SharedPtr pwm_cli_subscriber;
+        rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr ctrl_heartbeat_subscriber;
+        rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr cli_heartbeat_subscriber;
+       
+        rclcpp::Publisher<custom_interfaces::msg::Pwms>::SharedPtr pwm_cmd_publisher;
+        rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr current_control_mode;
+        rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr mux_heartbeat_publisher;
+       
+        rclcpp::TimerBase::SharedPtr ctrl_heartbeat_timer;
+        rclcpp::TimerBase::SharedPtr cli_heartbeat_timer;
+        rclcpp::TimerBase::SharedPtr mux_heartbeat_timer;
+
+
+        std::chrono::time_point<std::chrono::steady_clock> recent_ctrl_heartbeat;
+        std::chrono::time_point<std::chrono::steady_clock> recent_cli_heartbeat;
+
+
+        bool is_matlab_mode;
+        bool no_ctrl_heartbeat;
+        bool no_cli_heartbeat;
+};
+
+
